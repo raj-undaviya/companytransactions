@@ -1,5 +1,4 @@
 import MySQLdb as db
-
 # db connection
 def dbconnection():
     try:
