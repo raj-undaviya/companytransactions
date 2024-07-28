@@ -3,7 +3,7 @@ import MySQLdb as db
 # db connection
 def dbconnection():
     try:
-        con = db.connect(host="localhost", database="companytransactiondb", user='root', password="")
+        con = db.connect(host="localhost", database="companytransactiondb", user='rajundaviya', password="UcldH1tTM[v2dKG6")
         cursor = con.cursor()
         # print("Successfully connectd.........................")
         return con, cursor
