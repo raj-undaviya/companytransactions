@@ -2,7 +2,7 @@ import MySQLdb as db
 # db connection
 def dbconnection():
     try:
-        con = db.connect(host="localhost", database="companytransactiondb", user='rajundaviya', password="UcldH1tTM[v2dKG6")
+        con = db.connect(host="localhost", database="companytransactiondb", user='root', password="")
         cursor = con.cursor()
         # print("Successfully connectd.........................")
         return con, cursor
@@ -52,8 +52,8 @@ def getUserData(con, cursor, data):
         con.close()
 
 def transaction(con, cursor, record):
-    query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit)values('%s','%s','%s','%s','%s')"
-    arg = (record['added_by'],record['transaction_date'],record['transaction_desc'],record['credit'],record['debit'])
+    query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit,updated_by)values('%s','%s','%s','%s','%s','%s')"
+    arg = (record['added_by'],record['transaction_date'],record['transaction_desc'],record['credit'],record['debit'],record['updated_by'])
     try: 
         cursor.execute(query % arg)
         con.commit()
@@ -143,8 +143,9 @@ def debit_amount(con,cursor):
 
 # Update transaction data
 def updateTransactionData(con, cursor, data):
-    query = "UPDATE transactiontb SET transaction_date=%s, transaction_desc=%s, credit=%s, debit=%s WHERE id=%s"
-    args = (data['transaction_date'], data['transaction_desc'], data['credit'], data['debit'], data['id'])
+    print('data ------>',data)
+    query = "UPDATE transactiontb SET transaction_date=%s, transaction_desc=%s, credit=%s, debit=%s, updated_by=%s WHERE _id=%s"
+    args = (data['transaction_date'], data['transaction_desc'],data['credit'], data['debit'], data['updated_by'],data['_id'])
     try:
         cursor.execute(query, args)
         con.commit()
@@ -157,10 +158,11 @@ def updateTransactionData(con, cursor, data):
         cursor.close()
         con.close()
 
-def deleteTransactionData(con, cursor,id):
+def deleteTransactionData(con, cursor,data):
     query = "DELETE from transactiontb where _id='%d'"
+    arg = (data['_id'])
     try:
-        cursor.execute(query % id)
+        cursor.execute(query % arg)
         con.commit()
         return True
     except db.OperationalError as e:
@@ -169,7 +171,7 @@ def deleteTransactionData(con, cursor,id):
             con.ping(True)
             cursor = con.cursor()
             con.rollback()
-            cursor.execute(query, id)
+            cursor.execute(query, arg)
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
