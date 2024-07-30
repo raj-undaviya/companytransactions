@@ -62,74 +62,74 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/dashboard', methods = ['GET','POST'])
-def dashboard():
-    if session:
-        fullname = session.get("fullname")
-        data = {
-            "fullname":fullname
-        }
-        con, cursor = db.dbconnection()
-        transaction_data = db.getTransactionData(con, cursor)
+# @app.route('/dashboard', methods = ['GET','POST'])
+# def dashboard():
+#     if session:
+#         fullname = session.get("fullname")
+#         data = {
+#             "fullname":fullname
+#         }
+#         con, cursor = db.dbconnection()
+#         transaction_data = db.getTransactionData(con, cursor)
 
-        con, cursor = db.dbconnection()
-        creditAmountReport = db.credit_amount(con, cursor)
+#         con, cursor = db.dbconnection()
+#         creditAmountReport = db.credit_amount(con, cursor)
         
 
-        con, cursor = db.dbconnection()
-        debitAmountReport = db.debit_amount(con, cursor)
+#         con, cursor = db.dbconnection()
+#         debitAmountReport = db.debit_amount(con, cursor)
 
-        total_credit = sum(int(item[4].replace(',','')) for item in creditAmountReport)
-        c_amount = f"{total_credit:,}"
-        total_debit = sum(int(item[5].replace(',','')) for item in debitAmountReport)
-        d_amount = f"{total_debit:,}"
+#         total_credit = sum(int(item[4].replace(',','')) for item in creditAmountReport)
+#         c_amount = f"{total_credit:,}"
+#         total_debit = sum(int(item[5].replace(',','')) for item in debitAmountReport)
+#         d_amount = f"{total_debit:,}"
 
-        current_balance = total_credit - total_debit
-        c_balance = f"{current_balance:,}"
+#         current_balance = total_credit - total_debit
+#         c_balance = f"{current_balance:,}"
 
-        if request.method == 'POST':
-                added_by = fullname
-                transaction_date = request.form['transaction_date']
-                transaction_desc = request.form['transaction_desc']
-                if 'credit' in request.form:
-                    credit = int(request.form['credit'])
-                    cre = f"{credit:,}" if credit is not None else "-"
-                    data = {
-                        "added_by":added_by,
-                        "transaction_date":transaction_date,
-                        "transaction_desc":transaction_desc,
-                        "credit":cre,
-                        "debit":"-",
-                        "updated_by":"-"
-                    }
-                elif 'debit' in request.form:
-                    debit = int(request.form['debit'])
-                    deb = f"{debit:,}" if debit is not None else "-"
-                    data = {
-                        "added_by":added_by,
-                        "transaction_date":transaction_date,
-                        "transaction_desc":transaction_desc,
-                        "credit":"-",
-                        "debit":deb,
-                        "updated_by":"-"
-                    }
-                con, cursor = db.dbconnection()
-                if con is None or cursor is None:
-                    return "Database connection failed", 500
+#         if request.method == 'POST':
+#                 added_by = fullname
+#                 transaction_date = request.form['transaction_date']
+#                 transaction_desc = request.form['transaction_desc']
+#                 if 'credit' in request.form:
+#                     credit = int(request.form['credit'])
+#                     cre = f"{credit:,}" if credit is not None else "-"
+#                     data = {
+#                         "added_by":added_by,
+#                         "transaction_date":transaction_date,
+#                         "transaction_desc":transaction_desc,
+#                         "credit":cre,
+#                         "debit":"-",
+#                         "updated_by":"-"
+#                     }
+#                 elif 'debit' in request.form:
+#                     debit = int(request.form['debit'])
+#                     deb = f"{debit:,}" if debit is not None else "-"
+#                     data = {
+#                         "added_by":added_by,
+#                         "transaction_date":transaction_date,
+#                         "transaction_desc":transaction_desc,
+#                         "credit":"-",
+#                         "debit":deb,
+#                         "updated_by":"-"
+#                     }
+#                 con, cursor = db.dbconnection()
+#                 if con is None or cursor is None:
+#                     return "Database connection failed", 500
                 
-                if db.transaction(con, cursor, data):
-                    return redirect('dashboard')
-                else:
-                    return "Data not added due to error", 500
-    else:
-        return redirect('/')           
+#                 if db.transaction(con, cursor, data):
+#                     return redirect('dashboard')
+#                 else:
+#                     return "Data not added due to error", 500
+#     else:
+#         return redirect('/')           
 
-    return render_template('dashboard.html',
-                           data=data,
-                           transaction_data=transaction_data,
-                           c_amount=c_amount,
-                           d_amount=d_amount,
-                           c_balance=c_balance)
+#     return render_template('dashboard.html',
+#                            data=data,
+#                            transaction_data=transaction_data,
+#                            c_amount=c_amount,
+#                            d_amount=d_amount,
+#                            c_balance=c_balance)
 
 @app.route('/update', methods=['POST'])
 def update_transaction():
@@ -138,7 +138,7 @@ def update_transaction():
     transaction_id = request.form['id']
     transaction_date = request.form['update_transaction_date']
     transaction_desc = request.form['update_transaction_desc']
-    if 'Credit' in request.form:
+    if 'Credit' in request.form and 'Credit' != '':
         credit = int(request.form['Credit'])
         cre = f"{credit:,}" if credit is not None else "-"
         data = {
@@ -149,7 +149,7 @@ def update_transaction():
             "debit":"-",
             "updated_by":user
         }
-    elif 'Debit' in request.form:
+    elif 'Debit' in request.form and 'Debit' != '':
         debit = int(request.form['Debit'])
         deb = f"{debit:,}" if debit is not None else "-"
         data = {
@@ -176,42 +176,80 @@ def delete():
     delete_data = db.deleteTransactionData(con, cursor, data)
     return redirect('/dashboard')
 
-@app.route('/transactions')
-def transactions():
-    fullname = session.get('fullname')
-    data = {
-        "fullname":fullname
-    }
-    con, cursor = db.dbconnection()
-    trn_data = db.getTransactionData(con,cursor)
-    transaction_data = list(trn_data)
+@app.route('/dashboard', methods=['GET','POST'])
+def dashboard():
+    if session:
+        fullname = session.get('fullname')
+        data = {
+            "fullname":fullname
+        }
+        con, cursor = db.dbconnection()
+        trn_data = db.getTransactionData(con,cursor)
+        transaction_data = list(trn_data)
 
-    con, cursor = db.dbconnection()
-    creditAmountReport = db.credit_amount(con, cursor)
-    
-    con, cursor = db.dbconnection()
-    debitAmountReport = db.debit_amount(con, cursor)
+        con, cursor = db.dbconnection()
+        creditAmountReport = db.credit_amount(con, cursor)
+        
+        con, cursor = db.dbconnection()
+        debitAmountReport = db.debit_amount(con, cursor)
 
-    total_credit = sum(int(item[4].replace(',','')) for item in creditAmountReport)
-    c_amount = f"{total_credit:,}"
-    total_debit = sum(int(item[5].replace(',','')) for item in debitAmountReport)
-    d_amount = f"{total_debit:,}"
+        total_credit = sum(int(item[4].replace(',','')) for item in creditAmountReport)
+        c_amount = f"{total_credit:,}"
+        total_debit = sum(int(item[5].replace(',','')) for item in debitAmountReport)
+        d_amount = f"{total_debit:,}"
 
-    current_balance = total_credit - total_debit
-    c_balance = f"{current_balance:,}"
+        current_balance = total_credit - total_debit
+        c_balance = f"{current_balance:,}"
 
-    page = request.args.get('page', 1, type=int)
-    per_page = 10  # Number of items per page
-    total_transactions = len(transaction_data)
-    print(total_transactions)
-    total_pages = math.ceil(total_transactions / per_page)
+        page = request.args.get('page', 1, type=int)
+        per_page = 10  # Number of items per page
+        total_transactions = len(transaction_data)
+        # print(total_transactions)
+        total_pages = math.ceil(total_transactions / per_page)
 
-    start = (page - 1) * per_page
-    end = start + per_page
-    transactions_to_display = transaction_data[start:end]
+        start = (page - 1) * per_page
+        end = start + per_page
+        transactions_to_display = transaction_data[start:end]
+
+        if request.method == 'POST':
+            added_by = fullname
+            transaction_date = request.form['transaction_date']
+            transaction_desc = request.form['transaction_desc']
+            if 'credit' in request.form:
+                credit = int(request.form['credit'])
+                cre = f"{credit:,}" if credit is not None else "-"
+                data = {
+                    "added_by":added_by,
+                    "transaction_date":transaction_date,
+                    "transaction_desc":transaction_desc,
+                    "credit":cre,
+                    "debit":"-",
+                    "updated_by":"-"
+                }
+            elif 'debit' in request.form:
+                debit = int(request.form['debit'])
+                deb = f"{debit:,}" if debit is not None else "-"
+                data = {
+                    "added_by":added_by,
+                    "transaction_date":transaction_date,
+                    "transaction_desc":transaction_desc,
+                    "credit":"-",
+                    "debit":deb,
+                    "updated_by":"-"
+                }
+            con, cursor = db.dbconnection()
+            if con is None or cursor is None:
+                return "Database connection failed", 500
+            
+            if db.transaction(con, cursor, data):
+                return redirect('dashboard')
+            else:
+                return "Data not added due to error", 500
+    else:
+        return redirect('/')
 
     return render_template(
-        'transactions.html',
+        'dashboard.html',
         total_transactions=total_transactions,
         data=data,
         transaction_data=transactions_to_display,
