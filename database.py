@@ -52,8 +52,8 @@ def getUserData(con, cursor, data):
         con.close()
 
 def transaction(con, cursor, record):
-    query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit,updated_by)values('%s','%s','%s','%s','%s','%s')"
-    arg = (record['added_by'],record['transaction_date'],record['transaction_desc'],record['credit'],record['debit'],record['updated_by'])
+    query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit,updated_by,project_id)values('%s','%s','%s','%s','%s','%s','%d')"
+    arg = (record['added_by'],record['transaction_date'],record['transaction_desc'],record['credit'],record['debit'],record['updated_by'],record['project_id'])
     try: 
         cursor.execute(query % arg)
         con.commit()
@@ -67,22 +67,28 @@ def transaction(con, cursor, record):
         con.close()
 
 def getTransactionData(con, cursor):
-    query = "SELECT * FROM transactiontb"
+    query = """
+    SELECT * From transactiontb
+    JOIN projecttb ON transactiontb.project_id=project_id
+    WHERE projecttb._id=project_id
+    """
     try:
         cursor.execute(query)
         rec = cursor.fetchall()
-        if rec is None:
+        if rec is None or len(rec) == 0:
+            print("No records found")
             return None
         else:
+            print("Records fetched successfully")
             return rec
     except db.OperationalError as e:
+        print(f"OperationalError: {e}")
         if e.args[0] == 2006:  # MySQL server has gone away
-            # Attempt to reconnect
             con.ping(True)
             cursor = con.cursor()
             con.rollback()
             cursor.execute(query)
-            rec = cursor.fetchone()
+            rec = cursor.fetchall()
             return rec
     except db.DatabaseError as e:
         print(f"Database error: {e}")
@@ -172,6 +178,46 @@ def deleteTransactionData(con, cursor,data):
             cursor = con.cursor()
             con.rollback()
             cursor.execute(query, arg)
+            rec = cursor.fetchone()
+            return rec
+    except db.DatabaseError as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        cursor.close()
+        con.close()
+
+def projects(con, cursor, record):
+    query = "insert into projecttb(project_title,client_name,start_date,end_date,project_desc)values('%s','%s','%s','%s','%s')"
+    arg = (record['project_title'],record['client_name'],record['start_date'],record['end_date'],record['project_desc'])
+    try: 
+        cursor.execute(query % arg)
+        con.commit()
+        return True
+    except:
+        con.rollback()
+        print('Insertion problem...')
+        return False
+    finally:
+        cursor.close()
+        con.close()
+
+def getProjectData(con, cursor):
+    query = "SELECT * FROM projecttb"
+    try:
+        cursor.execute(query)
+        rec = cursor.fetchall()
+        if rec is None:
+            return None
+        else:
+            return rec
+    except db.OperationalError as e:
+        if e.args[0] == 2006:  # MySQL server has gone away
+            # Attempt to reconnect
+            con.ping(True)
+            cursor = con.cursor()
+            con.rollback()
+            cursor.execute(query)
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
