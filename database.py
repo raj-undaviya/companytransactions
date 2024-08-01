@@ -76,10 +76,8 @@ def getTransactionData(con, cursor):
         cursor.execute(query)
         rec = cursor.fetchall()
         if rec is None or len(rec) == 0:
-            print("No records found")
             return None
         else:
-            print("Records fetched successfully")
             return rec
     except db.OperationalError as e:
         print(f"OperationalError: {e}")
@@ -218,6 +216,45 @@ def getProjectData(con, cursor):
             cursor = con.cursor()
             con.rollback()
             cursor.execute(query)
+            rec = cursor.fetchone()
+            return rec
+    except db.DatabaseError as e:
+        print(f"Database error: {e}")
+        return None
+    finally:
+        cursor.close()
+        con.close()
+
+def updateProjectData(con, cursor, data):
+    print('data ------>',data)
+    query = "UPDATE projecttb SET project_title=%s, client_name=%s, start_date=%s, end_date=%s, project_desc=%s WHERE _id=%s"
+    args = (data['project_title'], data['client_name'],data['start_date'], data['end_date'], data['project_desc'],data['_id'])
+    try:
+        cursor.execute(query, args)
+        con.commit()
+        return True
+    except db.DatabaseError as e:
+        con.rollback()
+        print(f"Update problem: {e}")
+        return False
+    finally:
+        cursor.close()
+        con.close()
+
+def deleteProjectData(con, cursor,data):
+    query = "DELETE from projecttb where _id='%d'"
+    arg = (data['_id'])
+    try:
+        cursor.execute(query % arg)
+        con.commit()
+        return True
+    except db.OperationalError as e:
+        if e.args[0] == 2006:  # MySQL server has gone away
+            # Attempt to reconnect
+            con.ping(True)
+            cursor = con.cursor()
+            con.rollback()
+            cursor.execute(query, arg)
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:

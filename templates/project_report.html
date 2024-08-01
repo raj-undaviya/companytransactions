@@ -131,27 +131,27 @@
                                 </button>
                             </div>
                             <!-- Modal body -->
-                            <form class="p-4 md:p-5" method="post" action="/update" id="updateForm">
+                            <form class="p-4 md:p-5" method="post" action="/dashboard/project-report/update" id="updateForm">
                                 <input type="hidden" name="id" id="updateId" value="{{ project_data[0] }}">
                                 <div class="mb-4">
-                                    <label for="updateAddedBy" class="block text-sm font-medium text-gray-700">Added By</label>
-                                    <input type="text" id="updateAddedBy" name="added_by" value="{{ project_data[1] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" disabled>
+                                    <label for="updateProjectTitle" class="block text-sm font-medium text-gray-700">Project Title</label>
+                                    <input type="text" id="updateProjectTitle" name="project_title" value="{{ project_data[1] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     </div>
                                     <div class="mb-4">
-                                        <label for="updateTransactionDate" class="block text-sm font-medium text-gray-700">Transaction Date</label>
-                                        <input type="date" id="updateTransactionDate" name="update_project_date" value="{{ project_data[2] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                                        <label for="updateClientName" class="block text-sm font-medium text-gray-700">Client Name</label>
+                                        <input type="text" id="updateClientName" name="client_name" value="{{ project_data[2] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                                     </div>
                                     <div class="mb-4">
-                                        <label for="updateTransactionDesc" class="block text-sm font-medium text-gray-700">Transaction Description</label>
-                                        <input type="text" id="updateTransactionDesc" name="update_project_desc" value="{{ project_data[3] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
+                                        <label for="updateStartDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+                                        <input type="date" id="updateStartDate" name="start_date" value="{{ project_data[3] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                                     </div>
                                     <div class="mb-4">
-                                        <label for="updateCredit" class="block text-sm font-medium text-gray-700">Credit</label>
-                                        <input type="text" id="updateCredit" oninput="validateNumericInput(this)" name="Credit" value="{{ project_data[4] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <label for="updateEndDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                                        <input type="date" id="updateEndDate" name="end_date" value="{{ project_data[4] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     </div>
                                     <div class="mb-4">
-                                        <label for="updateDebit" class="block text-sm font-medium text-gray-700">Debit</label>
-                                        <input type="text" id="updateDebit" oninput="validateNumericInput(this)" name="Debit" value="{{ project_data[5] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <label for="updateProjectDesc" class="block text-sm font-medium text-gray-700">Description</label>
+                                        <input type="text" id="updateProjectDesc" name="project_desc" value="{{ project_data[5] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                     </div>
                                     <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button>
                             </form>
@@ -171,7 +171,7 @@
                                 <span class="sr-only">Close modal</span>
                             </button>
                             <div class="p-4 md:p-5 text-center">
-                                <form action="/delete" method="post">                               
+                                <form action="/dashboard/project-report/delete" method="post">                               
                                     <input type="hidden" name="id" id="updateId" value="{{ project_data[0] }}">
                                     <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>

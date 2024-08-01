@@ -61,50 +61,6 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/update', methods=['POST'])
-def update_transaction():
-    user = session.get('fullname')
-    transaction_id = request.form['id']
-    transaction_date = request.form['update_transaction_date']
-    transaction_desc = request.form['update_transaction_desc']
-    if 'Credit' in request.form and 'Credit' != '':
-        credit = int(request.form['Credit'])
-        cre = f"{credit:,}" if credit is not None else "-"
-        data = {
-            "_id":transaction_id,
-            "transaction_date":transaction_date,
-            "transaction_desc":transaction_desc,
-            "credit":cre,
-            "debit":"-",
-            "updated_by":user
-        }
-    elif 'Debit' in request.form and 'Debit' != '':
-        debit = int(request.form['Debit'])
-        deb = f"{debit:,}" if debit is not None else "-"
-        data = {
-            "_id":transaction_id,
-            "transaction_date":transaction_date,
-            "transaction_desc":transaction_desc,
-            "credit":"-",
-            "debit":deb,
-            "updated_by":user
-        }
-    con, cursor = db.dbconnection()
-    update_data = db.updateTransactionData(con, cursor, data)
-
-    return redirect('dashboard')
-
-@app.route('/delete', methods=['GET', 'POST'])
-def delete():
-    transaction_id = request.form['id']
-    _id = int(transaction_id)
-    data = {
-        "_id":_id
-    }
-    con, cursor = db.dbconnection()
-    delete_data = db.deleteTransactionData(con, cursor, data)
-    return redirect('/dashboard')
-
 @app.route('/dashboard', methods=['GET','POST'])
 def dashboard():
     if session:
@@ -199,7 +155,51 @@ def dashboard():
 
     return render_template('dashboard.html')
 
-@app.route('/add-project', methods=['GET','POST'])
+@app.route('/dashboard/update', methods=['POST'])
+def update_transaction():
+    user = session.get('fullname')
+    transaction_id = request.form['id']
+    transaction_date = request.form['update_transaction_date']
+    transaction_desc = request.form['update_transaction_desc']
+    if 'Credit' in request.form and 'Credit' != '':
+        credit = int(request.form['Credit'])
+        cre = f"{credit:,}" if credit is not None else "-"
+        data = {
+            "_id":transaction_id,
+            "transaction_date":transaction_date,
+            "transaction_desc":transaction_desc,
+            "credit":cre,
+            "debit":"-",
+            "updated_by":user
+        }
+    elif 'Debit' in request.form and 'Debit' != '':
+        debit = int(request.form['Debit'])
+        deb = f"{debit:,}" if debit is not None else "-"
+        data = {
+            "_id":transaction_id,
+            "transaction_date":transaction_date,
+            "transaction_desc":transaction_desc,
+            "credit":"-",
+            "debit":deb,
+            "updated_by":user
+        }
+    con, cursor = db.dbconnection()
+    update_data = db.updateTransactionData(con, cursor, data)
+
+    return redirect('/dashboard')
+
+@app.route('/dashboard/delete', methods=['GET', 'POST'])
+def delete():
+    transaction_id = request.form['id']
+    _id = int(transaction_id)
+    data = {
+        "_id":_id
+    }
+    con, cursor = db.dbconnection()
+    delete_data = db.deleteTransactionData(con, cursor, data)
+    return redirect('/dashboard')
+
+@app.route('/dashboard/add-project', methods=['GET','POST'])
 def add_project():
     if session:
         if request.method == 'POST':
@@ -222,7 +222,7 @@ def add_project():
     else:
         return redirect('/')
     
-    return redirect('dashboard')
+    return redirect('/dashboard')
 
 @app.route('/dashboard/project-report')
 def project_report():
@@ -242,15 +242,6 @@ def project_report():
         end = start + per_page
         projects_to_display = project_data[start:end]
 
-        # transaction_data = list(trn_data)
-        # page = request.args.get('page', 1, type=int)
-        # per_page = 10  # Number of items per page
-        # total_transactions = len(transaction_data)
-        # total_pages = math.ceil(total_transactions / per_page)
-
-        # start = (page - 1) * per_page
-        # end = start + per_page
-        # transactions_to_display = transaction_data[start:end]
     return render_template('project_report.html',
                            project_data=projectData,
                            data=data,
@@ -259,6 +250,41 @@ def project_report():
                            per_page=per_page,
                            total_pages=total_pages,
                            current_page=page)
+
+@app.route('/dashboard/project-report/update', methods=['POST'])
+def update_project_data():
+    if request.method == 'POST':
+            project_id = request.form['id']
+            project_title = request.form['project_title']
+            client_name = request.form['client_name']
+            start_date = request.form['start_date']
+            end_date = request.form['end_date']
+            project_desc = request.form['project_desc']
+
+            data = {
+                "_id":project_id,
+                "project_title":project_title,
+                "client_name":client_name,
+                "start_date":start_date,
+                "end_date":end_date,
+                "project_desc":project_desc
+            }
+
+            con, cursor = db.dbconnection()
+            project_data = db.updateProjectData(con, cursor, data)
+
+    return redirect('/dashboard/project-report')
+
+@app.route('/dashboard/project-report/delete', methods=['GET', 'POST'])
+def delete_project():
+    project_id = request.form['id']
+    _id = int(project_id)
+    data = {
+        "_id":_id
+    }
+    con, cursor = db.dbconnection()
+    delete_data = db.deleteProjectData(con, cursor, data)
+    return redirect('/dashboard/project-report')
 
 @app.route('/logout')
 def logout():

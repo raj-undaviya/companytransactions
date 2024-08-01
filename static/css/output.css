@@ -1418,6 +1418,10 @@ input:checked + .toggle-bg {
   margin-top: 50px;
 }
 
+.mr-10 {
+  margin-right: 2.5rem;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -3442,6 +3446,16 @@ input:checked + .toggle-bg {
 .py-\[0\.4rem\] {
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
+}
+
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+.px-20 {
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 
 .pb-2 {
