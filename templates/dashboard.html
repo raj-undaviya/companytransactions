@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
+    <title>Binary Infotech - Dashbaord</title>
     <link rel="stylesheet" href="/static/css/output.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="icon" type="image/png" sizes="32x32" href="../static/img/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../static/img/favicon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
+    <link rel="stylesheet" href="../static/css/fontawesome-free-6.6.0-web/css/all.min.css">
 </head>
 <body class="bg-gray-200">
 
@@ -169,17 +168,22 @@
                             <!-- Modal body -->
                             <form class="p-4 md:p-5 overflow-auto" method="post" action="/dashboard/update" id="updateForm">
                                 <input type="hidden" name="id" id="updateId" value="{{ transaction_data[0] }}">
-                                <div class="mb-4">
-                                    <label for="updateAddedBy" class="block text-sm font-medium text-gray-700">Added By</label>
-                                    <input type="text" id="updateAddedBy" name="added_by" value="{{ transaction_data[1] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" disabled>
+                                    <div class="mb-4">
+                                        <label for="updateAddedBy" class="block text-sm font-medium text-gray-700">Added By</label>
+                                        <input type="text" id="updateAddedBy" name="added_by" value="{{ transaction_data[1] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" disabled>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="transaction_date" class="block text-sm font-medium text-gray-700">Project Title</label>
+                                        <select id="update_project_title" name="update_project_title" class="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" disabled>
+                                            <option selected>{{ transaction_data[9] }}</option>
+                                            {% for project_data in project_data %}
+                                            <option value="{{ project_data[0] }}" name="project_id">{{ project_data[1] }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <div class="mb-4">
                                         <label for="updateTransactionDate" class="block text-sm font-medium text-gray-700">Transaction Date</label>
                                         <input type="date" id="updateTransactionDate" name="update_transaction_date" value="{{ transaction_data[2] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label for="updateTransactionDesc" class="block text-sm font-medium text-gray-700">Transaction Description</label>
-                                        <input type="text" id="updateTransactionDesc" name="update_transaction_desc" value="{{ transaction_data[3] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                                     </div>
                                     <div class="mb-4">
                                         <label for="updateCredit" class="block text-sm font-medium text-gray-700">Credit</label>
@@ -188,6 +192,10 @@
                                     <div class="mb-4">
                                         <label for="updateDebit" class="block text-sm font-medium text-gray-700">Debit</label>
                                         <input type="text" id="updateDebit" oninput="validateNumericInput(this)" name="Debit" value="{{ transaction_data[5] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="updateTransactionDesc" class="block text-sm font-medium text-gray-700">Transaction Description</label>
+                                        <textarea id="updateTransactionDesc" name="update_transaction_desc" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write transaction description here">{{ transaction_data[3] }}</textarea>
                                     </div>
                                     <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button>
                             </form>
@@ -258,9 +266,6 @@
                             {% for project_data in project_data %}
                             <option value="{{ project_data[0] }}" name="project_id">{{ project_data[1] }}</option>
                             {% endfor %}
-                            <!-- <option value="CA">Canada</option>
-                            <option value="FR">France</option>
-                            <option value="DE">Germany</option> -->
                         </select>
                     </div>
                     <div class="mb-4">
@@ -321,12 +326,35 @@
                         <label for="project_desc" class="block text-sm font-medium text-gray-700">Project Description</label>
                         <textarea id="project_desc" name="project_desc" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Write project description here"></textarea>
                     </div>
-                    <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Submit</button>
+                    <div id="dateError" class="text-red-600 mb-4 hidden">End date cannot be earlier than start date.</div>
+                    <button id="submitButton" type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" disabled>Submit</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <script>
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const submitButton = document.getElementById('submitButton');
+        const dateError = document.getElementById('dateError');
+    
+        function validateDates() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+    
+            if (endDate < startDate) {
+                dateError.classList.remove('hidden');
+                submitButton.disabled = true;
+            } else {
+                dateError.classList.add('hidden');
+                submitButton.disabled = false;
+            }
+        }
+    
+        startDateInput.addEventListener('change', validateDates);
+        endDateInput.addEventListener('change', validateDates);
+    </script>
     <script>
         function validateNumericInput(input) {
             input.value = input.value.replace(/[^0-9]/g, '');

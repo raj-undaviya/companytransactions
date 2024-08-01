@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import math
 
 app = Flask(__name__)
-app.secret_key = "qwertyuiop@134567890"
+app.secret_key = "your_secret_key"
 app.config['SESSION_COOKIE_EXPIRES'] = None
 
 @app.route('/', methods=['GET', 'POST'])
@@ -208,17 +208,19 @@ def add_project():
             start_date = request.form['start_date']
             end_date = request.form['end_date']
             project_desc = request.form['project_desc']
+            if end_date < start_date:
+                flash("End Date cannot earlier than start date.")
+            else:
+                data = {
+                    "project_title":project_title,
+                    "client_name":client_name,
+                    "start_date":start_date,
+                    "end_date":end_date,
+                    "project_desc":project_desc
+                }
 
-            data = {
-                "project_title":project_title,
-                "client_name":client_name,
-                "start_date":start_date,
-                "end_date":end_date,
-                "project_desc":project_desc
-            }
-
-            con, cursor = db.dbconnection()
-            project_data = db.projects(con, cursor, data)
+                con, cursor = db.dbconnection()
+                project_data = db.projects(con, cursor, data)
     else:
         return redirect('/')
     

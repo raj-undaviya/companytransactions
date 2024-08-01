@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
+    <title>Binary Infotech - Project Report</title>
     <link rel="stylesheet" href="/static/css/output.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="icon" type="image/png" sizes="32x32" href="../static/img/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../static/img/favicon.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="../node_modules/tw-elements/dist/js/tw-elements.umd.min.js"></script>
+    <link rel="stylesheet" href="../static/css/fontawesome-free-6.6.0-web/css/all.min.css">
 </head>
 <body class="bg-gray-200">
 
@@ -151,9 +150,10 @@
                                     </div>
                                     <div class="mb-4">
                                         <label for="updateProjectDesc" class="block text-sm font-medium text-gray-700">Description</label>
-                                        <input type="text" id="updateProjectDesc" name="project_desc" value="{{ project_data[5] }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <textarea id="updateProjectDesc" name="project_desc" rows="4" class="mt-1 block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ project_data[5] }}</textarea>
                                     </div>
-                                    <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button>
+                                    <div id="dateError" class="text-red-600 mb-4 hidden">End date cannot be earlier than start date.</div>
+                                    <button type="submit" id="submitButton" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button>
                             </form>
                         </div>
                     </div>
@@ -198,7 +198,29 @@
             {% endif %}
         </div>
     </section>
+
+    <script>
+        const startDateInput = document.getElementById('updateStartDate');
+        const endDateInput = document.getElementById('updateEndDate');
+        const submitButton = document.getElementById('submitButton');
+        const dateError = document.getElementById('dateError');
     
+        function validateDates() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+    
+            if (endDate < startDate) {
+                dateError.classList.remove('hidden');
+                submitButton.disabled = true;
+            } else {
+                dateError.classList.add('hidden');
+                submitButton.disabled = false;
+            }
+        }
+    
+        startDateInput.addEventListener('change', validateDates);
+        endDateInput.addEventListener('change', validateDates);
+    </script>    
     <script>
         function validateNumericInput(input) {
             input.value = input.value.replace(/[^0-9]/g, '');
