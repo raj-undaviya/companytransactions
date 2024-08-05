@@ -1,4 +1,5 @@
 from flask import *
+from flask_mail import Mail, Message
 import database as db
 from werkzeug.security import generate_password_hash, check_password_hash
 import math
@@ -6,6 +7,16 @@ import math
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 app.config['SESSION_COOKIE_EXPIRES'] = None
+
+app.config['MAIL_SERVER'] = 'smtp.hostinger.com'  # Replace with your mail server
+app.config['MAIL_PORT'] = 465  # Port for TLS, use 465 for SSL
+app.config['MAIL_USERNAME'] = 'no-reply@binaries.org.in'  # Your email address
+app.config['MAIL_PASSWORD'] = 'Raj@1708'  # Your email password
+app.config['MAIL_USE_TLS'] = False  # Set to False for SSL
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_DEFAULT_SENDER'] = 'no-reply@binaries.org.in'
+
+mail = Mail(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -27,6 +38,11 @@ def home():
                 session['fullname'] = view_data[1]
                 session['email'] = view_data[2]
                 session['password'] = view_data[3]
+                msg = Message('Hello from Flask',
+                            recipients=[email])
+                msg.body = 'This is a test email sent from a Flask application!'
+                msg.html = '<b>This is a test email sent from a Flask application!</b>'
+                mail.send(msg)
                 return redirect('dashboard')
             else:
                 return "Incorrect password", 400
@@ -62,6 +78,33 @@ def register():
             return "Registration failed", 500
 
     return render_template('register.html')
+
+@app.route('/forgot-password', methods=['GET','POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        data = {
+            "email_id":email
+        }
+        con, cursor = db.dbconnection()
+        user_data = db.getUserData(con, cursor, data)
+        if user_data:
+            password = request.form['password']
+            confirm_password = request.form['confirm_password']
+            if password == confirm_password:
+                hashed_password = generate_password_hash(password)
+                pass_data = {
+                    'email_id':email,
+                    'password':hashed_password
+                }
+                con, cursor = db.dbconnection()
+                update_password = db.update_password(con, cursor, pass_data)
+                return redirect('/')
+            else:
+                return "Password Does Not Match", 404
+        else:
+            return "User Not Found Register First", 404
+    return render_template('forgot_password.html')
 
 @app.route('/dashboard/user-update', methods=['POST'])
 def user_update():

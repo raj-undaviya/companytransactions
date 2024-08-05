@@ -48,6 +48,20 @@ def getUserData(con, cursor, data):
         cursor.close()
         con.close()
 
+def update_password(con, cursor, data):
+    query = 'UPDATE registrationtb SET password=%s WHERE email_id=%s'
+    args = (data['password'], data['email_id'])
+    try:
+        cursor.execute(query, args)
+        con.commit()
+        return True
+    except db.DatabaseError as e:
+        con.rollback()
+        return False, f"Update problem: {e}"
+    finally:
+        cursor.close()
+        con.close()
+
 def userUpdate(con, cursor, data):
     if 'password' in data:
         query = "UPDATE registrationtb SET fullname=%s, password=%s WHERE _id=%s"
