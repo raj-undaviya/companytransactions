@@ -23,8 +23,10 @@ def home():
         if view_data:
             stored_password = view_data[3]
             if check_password_hash(stored_password, password):
+                session['id'] = view_data[0]
                 session['fullname'] = view_data[1]
                 session['email'] = view_data[2]
+                session['password'] = view_data[3]
                 return redirect('dashboard')
             else:
                 return "Incorrect password", 400
@@ -61,14 +63,97 @@ def register():
 
     return render_template('register.html')
 
+@app.route('/dashboard/user-update', methods=['POST'])
+def user_update():
+    if request.method == 'POST':
+        user_id = session.get('id')
+        fullname = request.form['fullname']
+        current_password = request.form['currentPassword']
+        check_password = session.get('password')
+        new_password = request.form['password']
+        confirm_password = request.form['confirmPassword']
+        if new_password != '' and confirm_password != '':
+            if check_password_hash(check_password, current_password):
+                if new_password == confirm_password:
+                    secured_password = generate_password_hash(new_password)
+                    data = {
+                        '_id':user_id,
+                        'fullname':fullname,
+                        'password':secured_password
+                    }
+                    session['id'] = user_id
+                    session['fullname'] = fullname
+                    session['password'] = secured_password
+                    con, cursor = db.dbconnection()
+                    update_data = db.userUpdate(con, cursor, data)
+                    return redirect('/dashboard')
+                else:
+                    return "Given Password does not match", 500
+            else:
+                return "Current Password is incorrect", 500
+        else:
+            data = {
+                '_id':user_id,
+                'fullname':fullname,
+            }
+            session['id'] = user_id
+            session['fullname'] = fullname
+            con, cursor = db.dbconnection()
+            update_data = db.userUpdate(con, cursor, data)
+            return redirect('/dashboard')
+        
+    return redirect('/dashboard')
+
+@app.route('/dashboard/project-report/user-update', methods=['POST'])
+def user_detail_update():
+    if request.method == 'POST':
+        user_id = session.get('id')
+        fullname = request.form['fullname']
+        current_password = request.form['currentPassword']
+        check_password = session.get('password')
+        new_password = request.form['password']
+        confirm_password = request.form['confirmPassword']
+        if new_password != '' and confirm_password != '':
+            if check_password_hash(check_password, current_password):
+                if new_password == confirm_password:
+                    secured_password = generate_password_hash(new_password)
+                    data = {
+                        '_id':user_id,
+                        'fullname':fullname,
+                        'password':secured_password
+                    }
+                    session['id'] = user_id
+                    session['fullname'] = fullname
+                    session['password'] = secured_password
+                    con, cursor = db.dbconnection()
+                    update_data = db.userUpdate(con, cursor, data)
+                    return redirect('/dashboard/project-rreport')
+                else:
+                    return "Given Password does not match", 500
+            else:
+                return "Current Password is incorrect", 500
+        else:
+            data = {
+                '_id':user_id,
+                'fullname':fullname,
+            }
+            session['id'] = user_id
+            session['fullname'] = fullname
+            con, cursor = db.dbconnection()
+            update_data = db.userUpdate(con, cursor, data)
+            return redirect('/dashboard/project-report')
+        
+    return redirect('/dashboard/project-report')
+
 @app.route('/dashboard', methods=['GET','POST'])
 def dashboard():
     if session:
         fullname = session.get('fullname')
+        email = session.get('email')
         data = {
-            "fullname":fullname
+            "fullname":fullname,
+            "email":email
         }
-
         con, cursor = db.dbconnection()
         project_data = db.getProjectData(con, cursor)
 
@@ -230,7 +315,8 @@ def add_project():
 def project_report():
     if session:
         data = {
-            "fullname":session.get('fullname')
+            "fullname":session.get('fullname'),
+            "email":session.get('email')
         }
         con, cursor = db.dbconnection()
         projectData = db.getProjectData(con, cursor)

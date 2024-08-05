@@ -1,14 +1,13 @@
 import MySQLdb as db
+
 # db connection
 def dbconnection():
     try:
         con = db.connect(host="localhost", database="companytransactiondb", user='root', password="")
         cursor = con.cursor()
-        # print("Successfully connectd.........................")
         return con, cursor
     except db.DatabaseError as e:
-        print(f"Database connection failed: {e}")
-        return None, None
+        return None, None, f"Database connection failed: {e}"
     
 def register(con, cursor, record):
     query = "insert into registrationtb(fullname,email_id,password)values('%s','%s','%s')"
@@ -19,8 +18,7 @@ def register(con, cursor, record):
         return True
     except:
         con.rollback()
-        print('Insertion problem...')
-        return False
+        return False, 'Insertion problem...'
     finally:
         cursor.close()
         con.close()
@@ -45,11 +43,38 @@ def getUserData(con, cursor, data):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
+
+def userUpdate(con, cursor, data):
+    if 'password' in data:
+        query = "UPDATE registrationtb SET fullname=%s, password=%s WHERE _id=%s"
+        args = (data['fullname'], data['password'], data['_id'])
+        try:
+            cursor.execute(query, args)
+            con.commit()
+            return True
+        except db.DatabaseError as e:
+            con.rollback()
+            return False, f"Update problem: {e}"
+        finally:
+            cursor.close()
+            con.close()
+    else:
+        query = "UPDATE registrationtb SET fullname=%s WHERE _id=%s"
+        args = (data['fullname'], data['_id'])
+        try:
+            cursor.execute(query, args)
+            con.commit()
+            return True
+        except db.DatabaseError as e:
+            con.rollback()
+            return False, f"Update problem: {e}"
+        finally:
+            cursor.close()
+            con.close()
 
 def transaction(con, cursor, record):
     query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit,updated_by,project_id)values('%s','%s','%s','%s','%s','%s','%d')"
@@ -60,8 +85,7 @@ def transaction(con, cursor, record):
         return True
     except:
         con.rollback()
-        print('Insertion problem...')
-        return False
+        return False, 'Insertion problem...'
     finally:
         cursor.close()
         con.close()
@@ -80,7 +104,6 @@ def getTransactionData(con, cursor):
         else:
             return rec
     except db.OperationalError as e:
-        print(f"OperationalError: {e}")
         if e.args[0] == 2006:  # MySQL server has gone away
             con.ping(True)
             cursor = con.cursor()
@@ -89,8 +112,7 @@ def getTransactionData(con, cursor):
             rec = cursor.fetchall()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
@@ -114,8 +136,7 @@ def credit_amount(con,cursor):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
@@ -139,15 +160,13 @@ def debit_amount(con,cursor):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
 
 # Update transaction data
 def updateTransactionData(con, cursor, data):
-    print('data ------>',data)
     query = "UPDATE transactiontb SET transaction_date=%s, transaction_desc=%s, credit=%s, debit=%s, updated_by=%s WHERE _id=%s"
     args = (data['transaction_date'], data['transaction_desc'],data['credit'], data['debit'], data['updated_by'],data['_id'])
     try:
@@ -156,8 +175,7 @@ def updateTransactionData(con, cursor, data):
         return True
     except db.DatabaseError as e:
         con.rollback()
-        print(f"Update problem: {e}")
-        return False
+        return False, f"Update problem: {e}"
     finally:
         cursor.close()
         con.close()
@@ -179,8 +197,7 @@ def deleteTransactionData(con, cursor,data):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
@@ -194,8 +211,7 @@ def projects(con, cursor, record):
         return True
     except:
         con.rollback()
-        print('Insertion problem...')
-        return False
+        return False, 'Insertion problem...'
     finally:
         cursor.close()
         con.close()
@@ -219,14 +235,12 @@ def getProjectData(con, cursor):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
 
 def updateProjectData(con, cursor, data):
-    print('data ------>',data)
     query = "UPDATE projecttb SET project_title=%s, client_name=%s, start_date=%s, end_date=%s, project_desc=%s WHERE _id=%s"
     args = (data['project_title'], data['client_name'],data['start_date'], data['end_date'], data['project_desc'],data['_id'])
     try:
@@ -235,8 +249,7 @@ def updateProjectData(con, cursor, data):
         return True
     except db.DatabaseError as e:
         con.rollback()
-        print(f"Update problem: {e}")
-        return False
+        return False, f"Update problem: {e}"
     finally:
         cursor.close()
         con.close()
@@ -258,8 +271,7 @@ def deleteProjectData(con, cursor,data):
             rec = cursor.fetchone()
             return rec
     except db.DatabaseError as e:
-        print(f"Database error: {e}")
-        return None
+        return None, f"Database error: {e}"
     finally:
         cursor.close()
         con.close()
