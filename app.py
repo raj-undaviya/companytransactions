@@ -3,6 +3,7 @@ from flask_mail import Mail, Message
 import database as db
 from werkzeug.security import generate_password_hash, check_password_hash
 import math
+from flaskwebgui import FlaskUI
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -423,4 +424,5 @@ def logout():
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    FlaskUI(app=app, server="flask").run()

@@ -3,16 +3,49 @@ import MySQLdb as db
 # db connection
 def dbconnection():
     try:
-        con = db.connect(host="localhost", database="companytransactiondb", user='root', password="")
+        con = db.connect(host="srv874.hstgr.io", database="u664154894_companytransac", user='u664154894_rajundaviya', password="Raj.Soni@1999")
         cursor = con.cursor()
         return con, cursor
     except db.DatabaseError as e:
         return None, None, f"Database connection failed: {e}"
     
 def register(con, cursor, record):
+    check_table_query = """
+    CREATE TABLE IF NOT EXISTS registrationtb (
+        _id INT AUTO_INCREMENT PRIMARY KEY,
+        fullname VARCHAR(255) NOT NULL,
+        email_id VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS projecttb (
+        _id INT AUTO_INCREMENT PRIMARY KEY,
+        project_title VARCHAR(255) NOT NULL,
+        client_name VARCHAR(255) NOT NULL,
+        start_date DATE NOT NULL,
+        end_date DATE,
+        project_desc VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS transactiontb (
+        _id INT AUTO_INCREMENT PRIMARY KEY,
+        added_by VARCHAR(255) NOT NULL,
+        transaction_date DATE NOT NULL,
+        transaction_desc VARCHAR(255) NOT NULL,
+        credit VARCHAR(255) NOT NULL,
+        debit VARCHAR(255) NOT NULL,
+        updated_by VARCHAR(255),
+        project_id INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (project_id) REFERENCES projecttb(_id)
+    )
+    """
     query = "insert into registrationtb(fullname,email_id,password)values('%s','%s','%s')"
     arg = (record['fullname'],record['email_id'],record['password'])
-    try: 
+    try:
+        cursor.execute(check_table_query) 
         cursor.execute(query % arg)
         con.commit()
         return True
@@ -93,7 +126,7 @@ def userUpdate(con, cursor, data):
 def transaction(con, cursor, record):
     query = "insert into transactiontb(added_by,transaction_date,transaction_desc,credit,debit,updated_by,project_id)values('%s','%s','%s','%s','%s','%s','%d')"
     arg = (record['added_by'],record['transaction_date'],record['transaction_desc'],record['credit'],record['debit'],record['updated_by'],record['project_id'])
-    try: 
+    try:
         cursor.execute(query % arg)
         con.commit()
         return True
